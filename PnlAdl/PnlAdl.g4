@@ -1,0 +1,120 @@
+grammar PnlAdl;
+
+list
+	: element* EOF;
+
+//parser
+	
+element
+	: message_id flight_elem totals_by_dest_elem END_OF_TXT end_elem END_OF_TXT; //end;
+
+message_id
+	: ('PNL' | 'ADL');
+
+flight_elem
+	: flight OBLIQUE DATE ' ' P_AIRPORT_CODE ' ' PART_NUMBER;
+	
+flight
+	: AIRLINE_CODE FLIGHT_NUM;
+
+totals_by_dest_elem
+	: TOTALS_BY_DEST HYPHEN NUMBER_OF_PAD;
+	
+end_elem	
+	: END;
+	
+END
+	: END_OF_MULTI_PART END_OF_TXT END_OF_FINAL_PART END_OF_TXT;// END_OF_MSG;
+	
+END_OF_MULTI_PART
+	: 'ENDPART' NUM_ONE_TO_THREE;
+	
+NUMBER_OF_PAD
+	: IDENTIFYING_CODE NUM_ONE_TO_THREE;
+	
+//identifying_code
+//	: ALPHA_CHAR ALPHA_CHAR ALPHA_CHAR (ALPHA_CHAR (ALPHA_CHAR (ALPHA_CHAR ALPHA_CHAR?)?)?)?;
+	
+IDENTIFYING_CODE
+	: 'PAD';
+	
+TOTALS_BY_DEST
+	: HYPHEN AIRPORT_CODE NUM_TWO_TO_THREE ALPHA_CHAR;
+//lexer
+
+fragment DOT 
+	: '.';
+	
+PART_NUMBER
+	: 'PART'NUM_CHAR (NUM_CHAR NUM_CHAR?)?;
+	
+P_AIRPORT_CODE: AIRPORT_CODE;
+
+AIRLINE_CODE
+	: MIXED_CHAR MIXED_CHAR ALPHA_CHAR?;
+	
+FLIGHT_NUM
+	: NUM_CHAR NUM_CHAR NUM_CHAR NUM_CHAR? ALPHA_CHAR?;
+	
+NUM_ONE_TO_THREE
+	: NUM_CHAR (NUM_CHAR NUM_CHAR?)?;
+	
+DATE
+	: DAY MONTH;
+	
+DAY
+	: NUM_CHAR NUM_CHAR;	
+	
+MONTH
+	: ALPHA_CHAR ALPHA_CHAR ALPHA_CHAR;
+	
+
+AIRPORT_CODE
+	: ALPHA_CHAR ALPHA_CHAR ALPHA_CHAR;
+
+NUM_CHAR: ('0'..'9');
+//DIGIT_NOT_ZERO: ('1'..'9');
+	
+ALPHA_CHAR: ('A'..'Z');
+	
+MIXED_CHAR
+	: (ALPHA_CHAR | NUM_CHAR);
+	
+HYPHEN
+	: '-';
+	
+OBLIQUE
+	: '/';
+
+END_OF_SINGLE_PART
+	: 'ENDPTM';
+	
+END_OF_FINAL_PART
+	: 'ENDPNL' | 'ENDADL';
+	
+END_OF_TXT
+	: '\r\n';
+	
+END_OF_MSG
+	: '\n\n\nNNNN';
+	
+WS
+	: (' ' | '\t');
+	
+//WS 
+//	: ( ' ' | '\t' )+ { $channel = HIDDEN; };
+	
+ALPHA_ONE
+	: ALPHA_CHAR;
+	
+ALPHA_TWO
+	: ALPHA_CHAR ALPHA_CHAR;
+	
+ALPHA_THREE
+	: ALPHA_CHAR ALPHA_CHAR ALPHA_CHAR;
+	
+NUM_TWO_TO_THREE
+	: NUM_CHAR NUM_CHAR NUM_CHAR?;
+	
+
+	
